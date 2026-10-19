@@ -14,6 +14,11 @@ embeds the same numbers in the generated bindings, and `@stellar-starter-kit/sdk
 surfaces them to callers, so a variant must never be renumbered or removed:
 **append only.**
 
+All three contracts expose `version() -> u32`, sourced from the shared
+`CONTRACT_VERSION` constant in `contracts/version/src/lib.rs`. The value
+identifies the interface generation, not the deployed WASM: bump the constant
+once for a release that changes an interface, and every contract reports it.
+
 ---
 
 ## `stream` — `StreamContract`
@@ -37,6 +42,7 @@ between `start_time` and `end_time`, with an optional cliff.
 | `get_stream`     | `stream_id: u64`                                                                                                                                       | `Option<Stream>`                                                        | —              |
 | `get_config`     | —                                                                                                                                                      | `Option<Config>` (`None` if uninitialized)                              | —              |
 | `next_stream_id` | —                                                                                                                                                      | `u64` (`1` on a fresh deploy)                                           | —              |
+| `version`        | —                                                                                                                                                      | `u32` (the shared `CONTRACT_VERSION`)                                   | —              |
 
 Types returned by the views:
 
@@ -160,6 +166,7 @@ weights. Anyone may pay into a split and funds distribute on the spot.
 | `distribute`    | `split_id: u64, from: Address, token: Address, amount: i128`   | `Result<(), SplitError>`                     | `from`    |
 | `get_split`     | `split_id: u64`                                                | `Option<Split>`                              | —         |
 | `next_split_id` | —                                                              | `u64` (`1` on a fresh deploy)                | —         |
+| `version`       | —                                                              | `u32` (the shared `CONTRACT_VERSION`)        | —         |
 
 ```rust
 struct Split {
@@ -183,7 +190,7 @@ paired and must be the same length. A share is a weight, not a percentage —
 |  5   | `DuplicateRecipient` | `create_split` when an address appears twice, in any position.                                                                                                                                                                  |
 |  6   | `SplitNotFound`      | `distribute` for an unregistered `split_id` (or an archived entry).                                                                                                                                                             |
 |  7   | `Unauthorized`       | **Defined but never returned.** Kept so existing codes keep their values. Authorization failures in this contract surface as a Soroban `Context` error from `require_auth()`, not as this code — a client must not wait for it. |
-|  8   | `ShareOverflow`      | `create_split` when the sum of all shares exceeds `u32::MAX` (4,294,967,295). The maximum supported `total_shares` is `u32::MAX`.                                                                                              |
+|  8   | `ShareOverflow`      | `create_split` when the sum of all shares exceeds `u32::MAX` (4,294,967,295). The maximum supported `total_shares` is `u32::MAX`.                                                                                               |
 
 Rounding: each non-final recipient receives `amount * shares[i] / total_shares`
 (integer division, truncating) and the **final** recipient receives
@@ -223,6 +230,7 @@ with deadline-driven cancellation.
 | `cancel_escrow`  | `id: u64, caller: Address`                                                                      | `Result<(), EscrowError>`                      | `caller`, who must be `payer`              |
 | `get_escrow`     | `id: u64`                                                                                       | `Option<Escrow>`                               | —                                          |
 | `next_escrow_id` | —                                                                                               | `u64` (`1` on a fresh deploy)                  | —                                          |
+| `version`        | —                                                                                               | `u32` (the shared `CONTRACT_VERSION`)          | —                                          |
 
 ```rust
 struct Escrow {

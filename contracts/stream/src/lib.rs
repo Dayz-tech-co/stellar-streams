@@ -1,6 +1,7 @@
 #![no_std]
 #![allow(clippy::too_many_arguments)]
 
+use contract_version::CONTRACT_VERSION;
 use soroban_sdk::{
     contract, contracterror, contractevent, contractimpl, contracttype, token, Address, Env,
     String, Vec,
@@ -519,6 +520,12 @@ impl StreamContract {
             .publish(&env);
         Ok(())
     }
+    /// The contract interface version, shared by every contract in the
+    /// workspace.
+    pub fn version(_env: Env) -> u32 {
+        CONTRACT_VERSION
+    }
+
     pub fn claimable(env: Env, stream_id: u64) -> Result<i128, StreamError> {
         let stream: Stream = env
             .storage()

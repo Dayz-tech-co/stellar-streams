@@ -971,3 +971,10 @@ fn test_create_streams_max_batch_fits_mainnet_limits() {
         EVENTS_BYTES,
     );
 }
+
+#[test]
+fn test_version_matches_shared_constant() {
+    let env = Env::default();
+    let client = register(&env);
+    assert_eq!(client.version(), CONTRACT_VERSION);
+}
