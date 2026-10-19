@@ -1,11 +1,11 @@
 #![cfg(test)]
 #![allow(elided_lifetimes_in_paths, mismatched_lifetime_syntaxes)]
 use super::*;
+use proptest::prelude::*;
 use soroban_sdk::{
-    testutils::{Events as _, Ledger as _, MockAuth, MockAuthInvoke},
+    testutils::{Address as _, Events as _, Ledger as _, MockAuth, MockAuthInvoke},
     Env, Event, IntoVal, String, Val, Vec,
 };
-use proptest::prelude::*;
 
 #[path = "../../test-support/test_support.rs"]
 mod support;
